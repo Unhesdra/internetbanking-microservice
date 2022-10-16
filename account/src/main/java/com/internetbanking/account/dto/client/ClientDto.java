@@ -1,28 +1,22 @@
 package com.internetbanking.account.dto.client;
 
+import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
 
-import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 public class ClientDto {
 
-    @NotBlank
     private String firstName;
-    @NotBlank
     private String lastName;
-    @NotBlank
     private String documentId;
-
-    public ClientDto(String firstName, String lastName, String documentId) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.documentId = documentId;
-    }
+    private List<Account> accounts;
 
     public ClientDto(BankClient client) {
         this.firstName = client.getFirstName();
         this.lastName = client.getLastName();
         this.documentId = client.getDocumentId();
+        this.accounts = client.getAccounts();
     }
 
     public String getFirstName() {
@@ -36,4 +30,6 @@ public class ClientDto {
     public String getDocumentId() {
         return documentId;
     }
+
+    public List<Account> getAccounts() { return accounts; }
 }
