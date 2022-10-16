@@ -8,7 +8,6 @@ import java.util.List;
 public class BankClient {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long clientId;
     private String firstName;
     private String lastName;
@@ -19,7 +18,8 @@ public class BankClient {
     public BankClient() {
     }
 
-    public BankClient(String firstName, String lastName, String documentId) {
+    public BankClient(Long clientId, String firstName, String lastName, String documentId) {
+        this.clientId = clientId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.documentId = documentId;

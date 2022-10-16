@@ -30,7 +30,7 @@ public class AccountControllerIntegrationTest {
 
     @Test
     void debitTest() throws Exception {
-        Account account = new Account(1L, BigDecimal.TEN, 100, 1, 1);
+        Account account = new Account(BigDecimal.TEN, 100, 1, 1);
         AccountDto testAccountDto = new AccountDto(account);
 
         when(accountService.debit(any(DebitDto.class))).thenReturn(testAccountDto);

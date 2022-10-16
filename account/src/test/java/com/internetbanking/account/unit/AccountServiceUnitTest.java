@@ -41,10 +41,9 @@ public class AccountServiceUnitTest {
 
     @Test
     void debitWhenAccountDoesNotBelongToGivenClient() {
-        Account account1 = new Account(1L, new BigDecimal("100"), 100, 1, 1);
-        Account account2 = new Account(2L, new BigDecimal("100"), 101, 0, 1);
-        BankClient client = new BankClient("Oexdra", "Massella", "555.555.555-55");
-        client.setClientId(1L);
+        Account account1 = new Account(new BigDecimal("100"), 100, 1, 1);
+        Account account2 = new Account(new BigDecimal("100"), 101, 0, 1);
+        BankClient client = new BankClient(1L, "Oexdra", "Massella", "555.555.555-55");
         client.addAccount(account1);
         DebitDto debitDto = new DebitDto(2L, 1L, BigDecimal.TEN);
 
@@ -56,9 +55,8 @@ public class AccountServiceUnitTest {
 
     @Test
     void debitWhenInsufficientFundsInAccount() {
-        Account account = new Account(1L, new BigDecimal("5"), 100, 1, 1);
-        BankClient client = new BankClient("Oexdra", "Massella", "555.555.555-55");
-        client.setClientId(1L);
+        Account account = new Account(new BigDecimal("5"), 100, 1, 1);
+        BankClient client = new BankClient(1L, "Oexdra", "Massella", "555.555.555-55");
         client.addAccount(account);
         DebitDto debitDto = new DebitDto(1L, 1L, BigDecimal.TEN);
 
@@ -70,9 +68,8 @@ public class AccountServiceUnitTest {
 
     @Test
     void debitWhenOkTest() {
-        Account account = new Account(1L, new BigDecimal("100"), 100, 1, 1);
-        BankClient client = new BankClient("Oexdra", "Massella", "555.555.555-55");
-        client.setClientId(1L);
+        Account account = new Account(new BigDecimal("100"), 100, 1, 1);
+        BankClient client = new BankClient(1L, "Oexdra", "Massella", "555.555.555-55");
         client.addAccount(account);
         DebitDto debitDto = new DebitDto(1L, 1L, BigDecimal.TEN);
 

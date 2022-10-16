@@ -16,8 +16,7 @@ public class Account {
     public Account() {
     }
 
-    public Account(Long accountId, BigDecimal balance, Integer accountNumber, Integer checkDigit, Integer branch) {
-        this.accountId = accountId;
+    public Account(BigDecimal balance, Integer accountNumber, Integer checkDigit, Integer branch) {
         this.balance = balance;
         this.accountNumber = accountNumber;
         this.checkDigit = checkDigit;
