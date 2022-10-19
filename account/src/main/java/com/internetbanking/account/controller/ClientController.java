@@ -7,8 +7,10 @@ import com.internetbanking.account.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,9 +21,12 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping("/createClient")
-    public ResponseEntity<ClientDto> registerClient(@RequestBody @Valid CreateClientDto createClientDto) {
+    public ResponseEntity<ClientDto> registerClient(@RequestBody @Valid CreateClientDto createClientDto, UriComponentsBuilder uriBuilder) {
         ClientDto clientDto = clientService.registerClient(createClientDto);
-        return ResponseEntity.ok(clientDto);
+        URI uri = uriBuilder.path("/client/createClient")
+                .buildAndExpand(createClientDto.getClientId())
+                .toUri();
+        return ResponseEntity.created(uri).body(clientDto);
     }
 
     @GetMapping("/listClients")
