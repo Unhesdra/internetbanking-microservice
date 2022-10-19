@@ -43,9 +43,12 @@ public class ClientService {
             client = optionalClient.get();
         }
 
-        Integer lastAccountNumber = accountRepository.findLastAccountNumberByBranch(clientDto.getBranch());
-        if(lastAccountNumber == null) {
+        Integer lastAccountNumber;
+        Optional<Integer> optionalLastAccountNumber = accountRepository.findLastAccountNumberByBranch(clientDto.getBranch());
+        if(optionalLastAccountNumber.isEmpty()) {
             lastAccountNumber = 0;
+        } else {
+            lastAccountNumber = optionalLastAccountNumber.get();
         }
 
         Integer checkDigit = generateCheckDigit(lastAccountNumber + 1);
@@ -78,7 +81,8 @@ public class ClientService {
     @Transactional
     public ClientDto updateClient(UpdateClientDto updateClientDto, Long clientId) {
         BankClient client = getClientFromDatabase(clientId);
-        client.setDocumentId(updateClientDto.getDocumentId());
+        client.setFirstName(updateClientDto.getFirstName());
+        client.setLastName(updateClientDto.getLastName());
 
         return new ClientDto(client);
     }

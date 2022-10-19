@@ -25,10 +25,6 @@ public class BankClient {
         this.documentId = documentId;
     }
 
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
-    }
-
     public Long getClientId() {
         return clientId;
     }
@@ -37,16 +33,20 @@ public class BankClient {
         return firstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastName() {
         return lastName;
     }
 
-    public String getDocumentId() {
-        return documentId;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public void setDocumentId(String documentId) {
-        this.documentId = documentId;
+    public String getDocumentId() {
+        return documentId;
     }
 
     public List<Account> getAccounts() {

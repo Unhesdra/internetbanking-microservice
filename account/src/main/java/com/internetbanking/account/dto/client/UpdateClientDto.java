@@ -5,13 +5,20 @@ import javax.validation.constraints.NotBlank;
 public class UpdateClientDto {
 
     @NotBlank
-    private String documentId;
+    private String firstName;
+    @NotBlank
+    private String lastName;
 
-    public UpdateClientDto(String documentId) {
-        this.documentId = documentId;
+    public UpdateClientDto(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
-    public String getDocumentId() {
-        return documentId;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 }

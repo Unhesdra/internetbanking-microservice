@@ -20,6 +20,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("SELECT MAX(a.accountNumber) " +
             "FROM Account a " +
             "WHERE a.branch = :branch")
-    Integer findLastAccountNumberByBranch(@Param("branch") Integer branch);
+    Optional<Integer> findLastAccountNumberByBranch(@Param("branch") Integer branch);
 
 }
