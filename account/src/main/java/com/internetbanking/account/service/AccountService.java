@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -71,6 +72,22 @@ public class AccountService {
         return new AccountDto(receivingAccount);
     }
 
+    public Account createAccount(Integer branch) {
+        Integer lastAccountNumber;
+        Optional<Integer> optionalLastAccountNumber = accountRepository.findLastAccountNumberByBranch(branch);
+        if(optionalLastAccountNumber.isEmpty()) {
+            lastAccountNumber = 0;
+        } else {
+            lastAccountNumber = optionalLastAccountNumber.get();
+        }
+
+        Integer checkDigit = generateCheckDigit(lastAccountNumber + 1);
+        Account account = new Account(BigDecimal.ZERO, lastAccountNumber + 1, checkDigit, branch);
+        accountRepository.save(account);
+
+        return account;
+    }
+
     private Account checkIfAccountExists(Long accountId) {
         Optional<Account> optionalAccount = accountRepository.findById(accountId);
         if(optionalAccount.isEmpty()) {
@@ -117,5 +134,37 @@ public class AccountService {
         if(optionalClientAccount.isEmpty()) {
             throw new RuntimeException(("Account does not belong to specified user!"));
         }
+    }
+
+    private Integer generateCheckDigit(Integer accountNumber) {
+        int oddPositionSum = 0;
+        int evenPositionSum = 0;
+        int checkDigit = 0;
+
+        for (int i = 1; i < 8; i++) {
+            if (i % 2 == 1) {
+                int oddPositionNumber = accountNumber % (int) (Math.pow(10, i));
+                accountNumber = accountNumber - oddPositionNumber;
+                oddPositionNumber = oddPositionNumber / (int) (Math.pow(10, i - 1));
+                oddPositionSum = oddPositionSum + oddPositionNumber;
+            }
+            else {
+                int evenPositionNumber = accountNumber % (int) (Math.pow(10, i));
+                accountNumber = accountNumber - evenPositionNumber;
+                evenPositionNumber = evenPositionNumber / (int) (Math.pow(10, i - 1));
+                evenPositionSum = evenPositionSum + evenPositionNumber;
+            }
+        }
+
+        oddPositionSum = oddPositionSum * 3;
+
+        checkDigit = oddPositionSum + evenPositionSum;
+        checkDigit = checkDigit % 10;
+
+        if (checkDigit == 0) {
+            return 0;
+        }
+
+        return 10 - checkDigit;
     }
 }

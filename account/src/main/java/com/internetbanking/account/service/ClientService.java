@@ -5,13 +5,11 @@ import com.internetbanking.account.dto.client.CreateClientDto;
 import com.internetbanking.account.dto.client.UpdateClientDto;
 import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
-import com.internetbanking.account.repository.AccountRepository;
 import com.internetbanking.account.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,12 +18,12 @@ import java.util.stream.Collectors;
 public class ClientService {
 
     private final ClientRepository clientRepository;
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository, AccountRepository accountRepository) {
+    public ClientService(ClientRepository clientRepository, AccountService accountService) {
         this.clientRepository = clientRepository;
-        this.accountRepository = accountRepository;
+        this.accountService = accountService;
     }
 
     public ClientDto registerClient(CreateClientDto clientDto) {
@@ -43,19 +41,9 @@ public class ClientService {
             client = optionalClient.get();
         }
 
-        Integer lastAccountNumber;
-        Optional<Integer> optionalLastAccountNumber = accountRepository.findLastAccountNumberByBranch(clientDto.getBranch());
-        if(optionalLastAccountNumber.isEmpty()) {
-            lastAccountNumber = 0;
-        } else {
-            lastAccountNumber = optionalLastAccountNumber.get();
-        }
-
-        Integer checkDigit = generateCheckDigit(lastAccountNumber + 1);
-        Account account = new Account(BigDecimal.ZERO, lastAccountNumber + 1, checkDigit, clientDto.getBranch());
-
+        Account account = accountService.createAccount(clientDto.getBranch());
+        
         client.addAccount(account);
-        accountRepository.save(account);
         clientRepository.save(client);
 
         return new ClientDto(client);
@@ -103,38 +91,6 @@ public class ClientService {
         }
 
         return optionalClient.get();
-    }
-
-    private Integer generateCheckDigit(Integer accountNumber) {
-        int oddPositionSum = 0;
-        int evenPositionSum = 0;
-        int checkDigit = 0;
-
-        for (int i = 1; i < 8; i++) {
-            if (i % 2 == 1) {
-                int oddPositionNumber = accountNumber % (int) (Math.pow(10, i));
-                accountNumber = accountNumber - oddPositionNumber;
-                oddPositionNumber = oddPositionNumber / (int) (Math.pow(10, i - 1));
-                oddPositionSum = oddPositionSum + oddPositionNumber;
-            }
-            else {
-                int evenPositionNumber = accountNumber % (int) (Math.pow(10, i));
-                accountNumber = accountNumber - evenPositionNumber;
-                evenPositionNumber = evenPositionNumber / (int) (Math.pow(10, i - 1));
-                evenPositionSum = evenPositionSum + evenPositionNumber;
-            }
-        }
-
-        oddPositionSum = oddPositionSum * 3;
-
-        checkDigit = oddPositionSum + evenPositionSum;
-        checkDigit = checkDigit % 10;
-
-        if (checkDigit == 0) {
-            return 0;
-        }
-
-        return 10 - checkDigit;
     }
 
 }
