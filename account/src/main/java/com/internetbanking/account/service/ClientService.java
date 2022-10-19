@@ -39,10 +39,20 @@ public class ClientService {
             );
         } else {
             client = optionalClient.get();
+
+            Optional<Account> optionalAccountSameBranch = client
+                    .getAccounts()
+                    .stream()
+                    .filter(a -> a.getBranch() == clientDto.getBranch())
+                    .findFirst();
+
+            if(optionalAccountSameBranch.isPresent()) {
+                throw new RuntimeException("Client already has an account at this branch!");
+            }
         }
 
         Account account = accountService.createAccount(clientDto.getBranch());
-        
+
         client.addAccount(account);
         clientRepository.save(client);
 
