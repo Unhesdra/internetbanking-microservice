@@ -1,12 +1,15 @@
 package com.internetbanking.account.service;
 
 import com.internetbanking.account.dto.account.AccountDto;
-import com.internetbanking.account.dto.account.DepositDto;
 import com.internetbanking.account.dto.account.DebitDto;
+import com.internetbanking.account.dto.account.DepositDto;
 import com.internetbanking.account.dto.account.TransferDto;
 import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
-import com.internetbanking.account.exception.InsuficientFundsException;
+import com.internetbanking.account.exception.AccountDoesNotBelongToClientException;
+import com.internetbanking.account.exception.BankAccountNotFoundException;
+import com.internetbanking.account.exception.ClientNotFoundException;
+import com.internetbanking.account.exception.InsufficientFundsException;
 import com.internetbanking.account.repository.AccountRepository;
 import com.internetbanking.account.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +39,7 @@ public class AccountService {
         checkIfAccountBelongsToClient(account, client);
 
         if(!account.debit(debitDto.getDebitValue())) {
-            throw new InsuficientFundsException("Value cannot be debited! Insufficient funds!");
+            throw new InsufficientFundsException("Value cannot be debited! Insufficient funds!");
         }
         return new AccountDto(account);
     }
@@ -65,7 +68,7 @@ public class AccountService {
         checkIfAccountBelongsToClient(receivingAccount, receivingClient);
 
         if(!debitAccount.debit(transferDto.getTransferValue())) {
-            throw new RuntimeException("Value cannot be debited! Insufficient funds!");
+            throw new InsufficientFundsException("Value cannot be debited! Insufficient funds!");
         }
 
         receivingAccount.deposit(transferDto.getTransferValue());
@@ -91,7 +94,7 @@ public class AccountService {
     private Account checkIfAccountExists(Long accountId) {
         Optional<Account> optionalAccount = accountRepository.findById(accountId);
         if(optionalAccount.isEmpty()) {
-            throw new RuntimeException("Account cannot be found in database!");
+            throw new BankAccountNotFoundException("Account cannot be found in database!");
         }
 
         return optionalAccount.get();
@@ -100,7 +103,7 @@ public class AccountService {
     private Account checkIfAccountExists(Integer accountNumber, Integer branch) {
         Optional<Account> optionalAccount = accountRepository.findByAccountNumberAndBranch(accountNumber, branch);
         if(optionalAccount.isEmpty()) {
-            throw new RuntimeException("Account cannot be found in database!");
+            throw new BankAccountNotFoundException("Account cannot be found in database!");
         }
 
         return optionalAccount.get();
@@ -109,7 +112,7 @@ public class AccountService {
     private BankClient checkIfClientExists(Long clientId) {
         Optional<BankClient> optionalClient = clientRepository.findById(clientId);
         if(optionalClient.isEmpty()) {
-            throw new RuntimeException("Client cannot be found in database!");
+            throw new ClientNotFoundException("Client cannot be found in database!");
         }
 
         return optionalClient.get();
@@ -118,7 +121,7 @@ public class AccountService {
     private BankClient checkIfClientExists(String documentId) {
         Optional<BankClient> optionalClient = clientRepository.findByDocumentId(documentId);
         if(optionalClient.isEmpty()) {
-            throw new RuntimeException("Client cannot be found in database!");
+            throw new ClientNotFoundException("Client cannot be found in database!");
         }
 
         return optionalClient.get();
@@ -132,7 +135,7 @@ public class AccountService {
                 .filter(a -> a.getAccountId() == account.getAccountId());
 
         if(optionalClientAccount.isEmpty()) {
-            throw new RuntimeException(("Account does not belong to specified user!"));
+            throw new AccountDoesNotBelongToClientException(("Account does not belong to specified user!"));
         }
     }
 

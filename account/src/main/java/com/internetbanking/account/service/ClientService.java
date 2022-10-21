@@ -5,6 +5,8 @@ import com.internetbanking.account.dto.client.CreateClientDto;
 import com.internetbanking.account.dto.client.UpdateClientDto;
 import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
+import com.internetbanking.account.exception.ClientHasAccountAtBranchException;
+import com.internetbanking.account.exception.ClientNotFoundException;
 import com.internetbanking.account.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,7 @@ public class ClientService {
                     .findFirst();
 
             if(optionalAccountSameBranch.isPresent()) {
-                throw new RuntimeException("Client already has an account at this branch!");
+                throw new ClientHasAccountAtBranchException("Client already has an account at this branch!");
             }
         }
 
@@ -97,7 +99,7 @@ public class ClientService {
     private BankClient getClientFromDatabase(Long clientId) {
         Optional<BankClient> optionalClient = clientRepository.findById(clientId);
         if(optionalClient.isEmpty()) {
-            throw new RuntimeException("Client cannot be found in database!");
+            throw new ClientNotFoundException("Client cannot be found in database!");
         }
 
         return optionalClient.get();

@@ -4,7 +4,7 @@ import com.internetbanking.account.dto.account.AccountDto;
 import com.internetbanking.account.dto.account.DebitDto;
 import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
-import com.internetbanking.account.exception.InsuficientFundsException;
+import com.internetbanking.account.exception.InsufficientFundsException;
 import com.internetbanking.account.repository.AccountRepository;
 import com.internetbanking.account.repository.ClientRepository;
 import com.internetbanking.account.service.AccountService;
@@ -63,7 +63,7 @@ public class AccountServiceUnitTest {
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
         when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
 
-        assertThrows(InsuficientFundsException.class, () -> accountService.debit(debitDto));
+        assertThrows(InsufficientFundsException.class, () -> accountService.debit(debitDto));
     }
 
     @Test
