@@ -7,7 +7,6 @@ public class TransferDto {
 
     @NotNull
     private Long debitAccountId;
-
     @NotNull
     private Integer receivingAccountNumber;
     @NotNull

@@ -2,6 +2,7 @@ package com.internetbanking.account.entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 public class Account {
@@ -13,6 +14,8 @@ public class Account {
     private Integer accountNumber;
     private Integer checkDigit;
     private Integer branch;
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions;
     public Account() {
     }
 
@@ -54,5 +57,13 @@ public class Account {
 
     public void deposit(BigDecimal creditValue) {
         balance = balance.add(creditValue);
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
     }
 }

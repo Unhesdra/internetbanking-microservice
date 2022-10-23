@@ -6,6 +6,7 @@ import com.internetbanking.account.dto.account.DepositDto;
 import com.internetbanking.account.dto.account.TransferDto;
 import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
+import com.internetbanking.account.entity.Transaction;
 import com.internetbanking.account.exception.AccountDoesNotBelongToClientException;
 import com.internetbanking.account.exception.BankAccountNotFoundException;
 import com.internetbanking.account.exception.ClientNotFoundException;
@@ -19,16 +20,21 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static com.internetbanking.account.entity.TransactionType.DEBIT;
+import static com.internetbanking.account.entity.TransactionType.DEPOSIT;
+
 @Service
 public class AccountService {
 
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
+    private final TransactionService transactionService;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, ClientRepository clientRepository) {
+    public AccountService(AccountRepository accountRepository, ClientRepository clientRepository, TransactionService transactionService) {
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
+        this.transactionService = transactionService;
     }
 
     @Transactional
@@ -41,6 +47,10 @@ public class AccountService {
         if(!account.debit(debitDto.getDebitValue())) {
             throw new InsufficientFundsException("Value cannot be debited! Insufficient funds!");
         }
+
+        Transaction transaction = transactionService.registerTransaction(debitDto.getDebitValue(), account, DEBIT);
+        account.addTransaction(transaction);
+
         return new AccountDto(account);
     }
 
@@ -52,6 +62,9 @@ public class AccountService {
         checkIfAccountBelongsToClient(account, client);
 
         account.deposit(depositDto.getDepositValue());
+
+        Transaction transaction = transactionService.registerTransaction(depositDto.getDepositValue(), account, DEPOSIT);
+        account.addTransaction(transaction);
 
         return new AccountDto(account);
     }
@@ -72,6 +85,16 @@ public class AccountService {
         }
 
         receivingAccount.deposit(transferDto.getTransferValue());
+
+        Transaction debitTransaction = transactionService.registerTransaction(transferDto.getTransferValue(), debitAccount, DEBIT);
+        Transaction depositTransaction = transactionService.registerTransaction(transferDto.getTransferValue(), receivingAccount, DEPOSIT);
+
+        debitTransaction.setLinkedTransaction(depositTransaction);
+        depositTransaction.setLinkedTransaction(debitTransaction);
+
+        debitAccount.addTransaction(debitTransaction);
+        receivingAccount.addTransaction(depositTransaction);
+
         return new AccountDto(receivingAccount);
     }
 
@@ -131,8 +154,9 @@ public class AccountService {
         Optional<Account> optionalClientAccount = client
                 .getAccounts()
                 .stream()
-                .findFirst()
-                .filter(a -> a.getAccountId() == account.getAccountId());
+                .filter(a -> a.getAccountId() == account.getAccountId())
+                .findFirst();
+
 
         if(optionalClientAccount.isEmpty()) {
             throw new AccountDoesNotBelongToClientException(("Account does not belong to specified user!"));
