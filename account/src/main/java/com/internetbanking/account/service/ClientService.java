@@ -9,12 +9,12 @@ import com.internetbanking.account.exception.ClientHasAccountAtBranchException;
 import com.internetbanking.account.exception.ClientNotFoundException;
 import com.internetbanking.account.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -61,14 +61,11 @@ public class ClientService {
         return new ClientDto(client);
     }
 
-    public List<ClientDto> listClients() {
-        List<BankClient> clientList = clientRepository.findAll();
-        List<ClientDto> clientDtoList = clientList
-                .stream()
-                .map(client -> new ClientDto(client))
-                .collect(Collectors.toList());
+    public Page<ClientDto> listClients(Pageable pageable) {
+        Page<BankClient> clientPage = clientRepository.findAll(pageable);
+        Page<ClientDto> clientDtoPage = clientPage.map(ClientDto::new);
 
-        return clientDtoList;
+        return clientDtoPage;
     }
 
     public ClientDto listSpecificClient(Long clientId) {
