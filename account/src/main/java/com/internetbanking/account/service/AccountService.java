@@ -1,9 +1,7 @@
 package com.internetbanking.account.service;
 
-import com.internetbanking.account.dto.account.AccountDto;
-import com.internetbanking.account.dto.account.DebitDto;
-import com.internetbanking.account.dto.account.DepositDto;
-import com.internetbanking.account.dto.account.TransferDto;
+import com.internetbanking.account.dto.account.*;
+import com.internetbanking.account.dto.transaction.TransactionDto;
 import com.internetbanking.account.entity.Account;
 import com.internetbanking.account.entity.BankClient;
 import com.internetbanking.account.entity.Transaction;
@@ -14,6 +12,8 @@ import com.internetbanking.account.exception.InsufficientFundsException;
 import com.internetbanking.account.repository.AccountRepository;
 import com.internetbanking.account.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -112,6 +112,15 @@ public class AccountService {
         accountRepository.save(account);
 
         return account;
+    }
+
+    public Page<TransactionDto> getAccountTransaction(StatementDto statementDto, Pageable pageable) {
+        Account account = checkIfAccountExists(statementDto.getAccountId());
+        BankClient client = checkIfClientExists(statementDto.getClientId());
+
+        checkIfAccountBelongsToClient(account, client);
+
+        return transactionService.getAccountTransaction(account.getAccountId(), pageable);
     }
 
     private Account checkIfAccountExists(Long accountId) {

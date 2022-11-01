@@ -18,6 +18,9 @@ public class Transaction {
     @OneToOne
     private Transaction linkedTransaction;
 
+    public Transaction() {
+    }
+
     public Transaction(BigDecimal value,
                        Account account,
                        TransactionType transactionType) {
