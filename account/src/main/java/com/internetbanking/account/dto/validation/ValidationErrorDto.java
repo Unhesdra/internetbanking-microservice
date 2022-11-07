@@ -3,18 +3,18 @@ package com.internetbanking.account.dto.validation;
 public class ValidationErrorDto {
 
     private String field;
-    private String error;
+    private String erroMessage;
 
-    public ValidationErrorDto(String field, String error) {
+    public ValidationErrorDto(String field, String errorMessage) {
         this.field = field;
-        this.error = error;
+        this.erroMessage = errorMessage;
     }
 
     public String getField() {
         return field;
     }
 
-    public String getError() {
-        return error;
+    public String getErroMessage() {
+        return erroMessage;
     }
 }

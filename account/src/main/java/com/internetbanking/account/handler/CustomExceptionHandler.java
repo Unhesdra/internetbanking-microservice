@@ -1,6 +1,7 @@
 package com.internetbanking.account.handler;
 
 import com.internetbanking.account.dto.validation.ValidationErrorDto;
+import com.internetbanking.account.exception.BankAccountNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,12 @@ public class CustomExceptionHandler {
         });
 
         return fieldErrorsDto;
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BankAccountNotFoundException.class)
+    public String handle(BankAccountNotFoundException exception) {
+        return exception.getMessage();
     }
 
 }
